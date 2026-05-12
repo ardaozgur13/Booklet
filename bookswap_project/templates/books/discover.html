@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Kitapları Keşfet{% endblock %}
+{% block content %}
+<div class="page-header"><h1>🔍 Kitapları Keşfet</h1><p class="text-muted">Takas için bekleyen kitapları bul</p></div>
+<form method="get">
+  <div class="filter-row">
+    <div class="form-group" style="flex:1;min-width:200px;">
+      <label class="form-label">Ara</label>
+      <input type="text" name="q" class="form-control" placeholder="Kitap adı veya yazar…" value="{{ q }}">
+    </div>
+    <div class="form-group" style="min-width:160px;">
+      <label class="form-label">Şehir</label>
+      <select name="city" class="form-control">
+        <option value="">Tüm Şehirler</option>
+        {% for c in cities %}<option value="{{ c }}" {% if c == city %}selected{% endif %}>{{ c }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group" style="min-width:160px;">
+      <label class="form-label">Tür</label>
+      <select name="genre" class="form-control">
+        <option value="">Tüm Türler</option>
+        {% for value, label in genres %}
+        <option value="{{ value }}" {% if value == genre %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group" style="align-self:flex-end;">
+      <button type="submit" class="btn btn-primary">Filtrele</button>
+      {% if q or city or genre %}<a href="{% url 'books:discover' %}" class="btn btn-secondary">Temizle</a>{% endif %}
+    </div>
+  </div>
+</form>
+{% if books %}
+<p class="text-muted" style="margin-bottom:1rem;font-family:sans-serif;font-size:.88rem;">{{ books|length }} kitap bulundu</p>
+<div class="book-grid">
+  {% for book in books %}
+  <div class="book-card">
+    <div style="display:flex;gap:1rem;align-items:flex-start;">
+      <div class="book-spine"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="book-card-title">{{ book.title }}</div>
+        <div class="book-card-author">{{ book.author }}</div>
+        <div style="margin-top:4px;">
+          <span class="badge" style="background:var(--c-surface-2);color:var(--c-secondary);font-size:.75rem;">{{ book.get_genre_display }}</span>
+        </div>
+        <div class="book-card-info">{{ book.publisher }} &bull; {{ book.edition }}. Baskı &bull; {{ book.page_count }} s.</div>
+      </div>
+    </div>
+    <div style="margin-top:.75rem;font-size:.82rem;color:var(--c-text-muted);font-family:sans-serif;">
+      <a href="{% url 'accounts:user_profile' book.owner.pk %}" style="color:var(--c-secondary);">{{ book.owner.get_full_name }}</a>
+      {% if book.owner.city %}&bull; {{ book.owner.city }}{% endif %}
+      {% if book.owner.rating_count > 0 %}
+      &bull; <span class="stars" style="font-size:.8rem;">{% for i in "12345" %}{% if forloop.counter <= book.owner.rating_average|floatformat:"0" %}★{% else %}☆{% endif %}{% endfor %}</span>
+      {% endif %}
+    </div>
+    <div class="book-card-actions">
+      <a href="{% url 'books:book_detail' book.pk %}" class="btn btn-secondary btn-xs">Detay</a>
+      {% if user.is_authenticated and book.owner != user %}
+      <a href="{% url 'exchange:request' book.pk %}" class="btn btn-accent btn-xs">Takas Teklif Et</a>
+      {% elif not user.is_authenticated %}
+      <a href="{% url 'accounts:login' %}" class="btn btn-accent btn-xs">Giriş Yap</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🔍</div><h3>Sonuç bulunamadı</h3><p>Farklı arama kriterleri deneyin.</p></div>
+{% endif %}
+{% endblock %}

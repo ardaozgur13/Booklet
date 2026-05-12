@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ other_user.get_full_name }} ile Sohbet{% endblock %}
+
+{% block extra_css %}
+<style>
+  .msg-row { display:flex; flex-direction:column; margin-bottom:.25rem; }
+  .msg-row.mine { align-items:flex-end; }
+  .msg-row.theirs { align-items:flex-start; }
+  .msg-bubble {
+    max-width:72%; padding:.6rem 1rem;
+    font-size:.92rem; line-height:1.5;
+    word-break:break-word; box-shadow:var(--shadow);
+  }
+  .msg-bubble.mine {
+    background:var(--c-primary); color:var(--c-white);
+    border-radius:14px 14px 4px 14px; border:none;
+  }
+  .msg-bubble.theirs {
+    background:var(--c-white); color:var(--c-text);
+    border-radius:14px 14px 14px 4px; border:1px solid var(--c-border);
+  }
+  .msg-time {
+    font-size:.72rem; color:var(--c-text-muted);
+    font-family:sans-serif; margin-top:3px; padding:0 4px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;margin:0 auto;">
+
+  <!-- Başlık kartı -->
+  <div class="card" style="margin-bottom:1rem;padding:1rem 1.5rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        {% if other_user.profile_photo %}
+          <img src="{{ other_user.profile_photo.url }}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+        {% else %}
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--c-surface-2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👤</div>
+        {% endif %}
+        <div>
+          <div style="font-weight:700;color:var(--c-primary);">{{ other_user.get_full_name }}</div>
+          <div class="text-muted" style="font-size:.8rem;">@{{ other_user.username }}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:.8rem;color:var(--c-text-muted);font-family:sans-serif;">Takas</div>
+        <div style="font-size:.88rem;color:var(--c-primary);font-weight:600;">
+          {{ exchange.offered_book.title }} ⇄ {{ exchange.requested_book.title }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sohbet kutusu -->
+  <div style="background:var(--c-white);border:1px solid var(--c-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);">
+
+    <!-- Mesajlar -->
+    <div id="chat-box" style="height:420px;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:.5rem;background:var(--c-bg);">
+      {% if chat_messages %}
+        {% for msg in chat_messages %}
+        <div class="msg-row {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}">
+          <div class="msg-bubble {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}">
+            {{ msg.content }}
+          </div>
+          <div class="msg-time">
+            {{ msg.created_at|date:"d M" }} {{ msg.created_at|time:"H:i" }}
+            {% if msg.sender == request.user %}{% if msg.is_read %}&bull; ✓ okundu{% endif %}{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center;color:var(--c-text-muted);margin:auto;font-family:sans-serif;font-size:.9rem;">
+          <div style="font-size:2.5rem;margin-bottom:.5rem;">💬</div>
+          Henüz mesaj yok. İlk mesajı sen gönder!
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Mesaj gönderme formu -->
+    <div style="padding:1rem;border-top:1px solid var(--c-border);background:var(--c-white);">
+      <form method="post" style="display:flex;gap:.75rem;align-items:flex-end;">
+        {% csrf_token %}
+        <textarea
+          name="content"
+          class="form-control"
+          rows="2"
+          placeholder="Mesajınızı yazın…"
+          style="flex:1;resize:none;"
+          required
+        ></textarea>
+        <button type="submit" class="btn btn-primary" style="flex-shrink:0;">Gönder</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Alt linkler -->
+  <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap;">
+    <a href="{% url 'exchange:history' %}" class="btn btn-secondary btn-sm">← Geçmişe Dön</a>
+    {% if exchange.is_completed %}
+      {% if exchange.requester == request.user and not exchange.requester_rated %}
+        <a href="{% url 'exchange:rate' exchange.pk %}" class="btn btn-accent btn-sm">★ Puan Ver</a>
+      {% elif exchange.owner == request.user and not exchange.owner_rated %}
+        <a href="{% url 'exchange:rate' exchange.pk %}" class="btn btn-accent btn-sm">★ Puan Ver</a>
+      {% endif %}
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+  var box = document.getElementById('chat-box');
+  if (box) box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

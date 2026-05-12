@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:0 auto;">
+  <div class="card">
+    <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
+      <div style="width:72px;height:96px;background:var(--c-surface-2);border-radius:4px 10px 10px 4px;border-left:8px solid var(--c-accent);flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <h1 style="font-size:1.5rem;margin-bottom:.3rem;">{{ book.title }}</h1>
+        <p style="color:var(--c-text-muted);font-size:1rem;font-family:sans-serif;">{{ book.author }}</p>
+        <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-family:sans-serif;font-size:.9rem;">
+          <div><span style="color:var(--c-text-muted);">Yayınevi:</span> {{ book.publisher }}</div>
+          <div><span style="color:var(--c-text-muted);">Baskı:</span> {{ book.edition }}. Baskı</div>
+          <div><span style="color:var(--c-text-muted);">Sayfa:</span> {{ book.page_count }}</div>
+          <div><span style="color:var(--c-text-muted);">Eklenme:</span> {{ book.created_at|date:"d M Y" }}</div>
+        </div>
+        {% if book.is_public %}<div style="margin-top:1rem;"><span class="badge badge-public">✓ Takas Listesinde</span></div>{% endif %}
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--c-border);margin:1.5rem 0;">
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      {% if book.owner.profile_photo %}
+        <img src="{{ book.owner.profile_photo.url }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+      {% else %}
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--c-surface-2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">👤</div>
+      {% endif %}
+      <div>
+        <a href="{% url 'accounts:user_profile' book.owner.pk %}" style="font-weight:700;color:var(--c-primary);">{{ book.owner.get_full_name }}</a>
+        {% if book.owner.city %}<div class="text-muted" style="font-size:.82rem;">{{ book.owner.city }}</div>{% endif %}
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;">
+      {% if user.is_authenticated and book.owner != user and book.is_public %}
+        <a href="{% url 'exchange:request' book.pk %}" class="btn btn-accent">Takas Teklif Et</a>
+      {% elif user == book.owner %}
+        <a href="{% url 'books:book_edit' book.pk %}" class="btn btn-secondary btn-sm">Düzenle</a>
+      {% endif %}
+      <a href="{% url 'books:discover' %}" class="btn btn-secondary">← Keşfete Dön</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Kütüphanem{% endblock %}
+{% block content %}
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+  <div><h1>📚 Kütüphanem</h1><p class="text-muted">{{ request.user.book_count }} kitap</p></div>
+  <a href="{% url 'books:book_add' %}" class="btn btn-primary">+ Kitap Ekle</a>
+</div>
+<form method="get" class="search-bar">
+  <input type="text" name="q" class="form-control" placeholder="Kitap adı, yazar veya yayınevi ara…" value="{{ q }}">
+  <button type="submit" class="btn btn-primary">Ara</button>
+  {% if q %}<a href="{% url 'books:my_library' %}" class="btn btn-secondary">Temizle</a>{% endif %}
+</form>
+{% if books %}
+<div class="book-grid">
+  {% for book in books %}
+  <div class="book-card">
+    <div style="display:flex;gap:1rem;align-items:flex-start;">
+      <div class="book-spine"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="book-card-title">{{ book.title }}</div>
+        <div class="book-card-author">{{ book.author }}</div>
+        <div class="book-card-info">{{ book.publisher }} &bull; {{ book.edition }}. Baskı &bull; {{ book.page_count }} s.</div>
+      </div>
+    </div>
+    <div style="margin-top:.75rem;">
+      {% if book.is_public %}<span class="badge badge-public">✓ Takas Listesinde</span>
+      {% else %}<span class="badge badge-private">Gizli</span>{% endif %}
+    </div>
+    <div class="book-card-actions">
+      <form method="post" action="{% url 'books:book_toggle_public' book.pk %}" style="display:inline;">
+        {% csrf_token %}
+        {% if book.is_public %}<button type="submit" class="btn btn-secondary btn-xs">Gizle</button>
+        {% else %}<button type="submit" class="btn btn-success btn-xs">Takas'a Aç</button>{% endif %}
+      </form>
+      <a href="{% url 'books:book_edit' book.pk %}" class="btn btn-secondary btn-xs">Düzenle</a>
+      <a href="{% url 'books:book_delete' book.pk %}" class="btn btn-danger btn-xs">Sil</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">📖</div>
+  {% if q %}<h3>"{{ q }}" için sonuç bulunamadı</h3><p>Farklı bir arama terimi dene.</p>
+  <a href="{% url 'books:my_library' %}" class="btn btn-secondary" style="margin-top:1rem;">Tümünü Göster</a>
+  {% else %}<h3>Henüz kitap eklemediniz</h3><p>Kitaplığınıza kitap ekleyerek başlayın.</p>
+  <a href="{% url 'books:book_add' %}" class="btn btn-primary" style="margin-top:1rem;">İlk Kitabı Ekle</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.get_full_name }}{% endblock %}
+{% block content %}
+<div class="profile-header">
+  {% if profile_user.profile_photo %}
+    <img src="{{ profile_user.profile_photo.url }}" alt="Profil" class="profile-avatar">
+  {% else %}
+    <div class="profile-avatar-placeholder">👤</div>
+  {% endif %}
+  <div class="profile-info">
+    <h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+    <p class="text-muted">@{{ profile_user.username }}{% if profile_user.city %} &bull; {{ profile_user.city }}{% endif %}{% if profile_user.gender %} &bull; {{ profile_user.get_gender_display }}{% endif %}</p>
+    {% if profile_user.rating_count > 0 %}
+    <div class="rating-display" style="margin-top:.5rem;">
+      <span class="stars">{% for i in "12345" %}{% if forloop.counter <= profile_user.rating_average|floatformat:"0" %}★{% else %}☆{% endif %}{% endfor %}</span>
+      <span class="rating-score">{{ profile_user.rating_average }}</span>
+      <span class="rating-count">({{ profile_user.rating_count }} değerlendirme)</span>
+    </div>
+    {% else %}
+    <p class="text-muted" style="margin-top:.5rem;font-size:.85rem;">Henüz değerlendirme yok</p>
+    {% endif %}
+    <div class="profile-stats">
+      <div class="stat-item"><div class="stat-number">{{ profile_user.book_count }}</div><div class="stat-label">Kitap</div></div>
+      <div class="stat-item"><div class="stat-number">{{ profile_user.rating_count }}</div><div class="stat-label">Takas</div></div>
+    </div>
+    {% if user == profile_user %}
+    <div style="margin-top:1rem;display:flex;gap:.75rem;">
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary btn-sm">Profili Düzenle</a>
+      <a href="{% url 'books:book_add' %}" class="btn btn-accent btn-sm">Kitap Ekle</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="margin-top:1.5rem;">
+  <h3 style="margin-bottom:1rem;">Takas Listesindeki Kitaplar</h3>
+  {% with public_books=profile_user.books.all %}
+  {% if public_books %}
+  <div class="book-grid">
+    {% for book in public_books %}{% if book.is_public %}
+    <div class="book-card">
+      <div style="display:flex;gap:1rem;">
+        <div class="book-spine"></div>
+        <div><div class="book-card-title">{{ book.title }}</div><div class="book-card-author">{{ book.author }}</div><div class="book-card-info">{{ book.publisher }} &bull; {{ book.edition }}. Baskı</div></div>
+      </div>
+      {% if user.is_authenticated and user != profile_user %}
+      <div class="book-card-actions"><a href="{% url 'exchange:request' book.pk %}" class="btn btn-accent btn-xs">Takas Teklif Et</a></div>
+      {% endif %}
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+  {% else %}<p class="text-muted">Henüz takas listesinde kitap yok.</p>{% endif %}
+  {% endwith %}
+</div>
+
+{% with ratings=profile_user.received_ratings.all %}
+{% if ratings %}
+<div style="margin-top:2rem;">
+  <h3 style="margin-bottom:1rem;">Değerlendirmeler</h3>
+  {% for rating in ratings %}
+  <div class="card card-sm" style="margin-bottom:.75rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem;">
+      <span class="stars">{% for i in "12345" %}{% if forloop.counter <= rating.score %}★{% else %}☆{% endif %}{% endfor %}</span>
+      <span style="font-size:.85rem;color:var(--c-text-muted);font-family:sans-serif;">
+        <a href="{% url 'accounts:user_profile' rating.giver.pk %}">{{ rating.giver.get_full_name }}</a> &bull; {{ rating.created_at|date:"d M Y" }}
+      </span>
+    </div>
+    {% if rating.comment %}<p style="margin:0;font-size:.9rem;">{{ rating.comment }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+{% endblock %}

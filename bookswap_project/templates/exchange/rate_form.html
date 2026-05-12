@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Kullanıcıyı Puanla{% endblock %}
+{% block content %}
+<div class="form-box form-box-wide" style="margin-top:1rem;">
+  <div class="form-title"><h2>⭐ Takas Değerlendirmesi</h2><p class="text-muted">{{ receiver.get_full_name }} ile olan takasınızı değerlendirin</p></div>
+  <div class="card" style="background:var(--c-surface);margin-bottom:1.75rem;">
+    <p class="text-muted" style="font-size:.78rem;margin-bottom:.75rem;font-family:sans-serif;">Takas Özeti</p>
+    <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
+      <div style="text-align:center;"><div style="font-size:.78rem;color:var(--c-text-muted);font-family:sans-serif;margin-bottom:3px;">Teklif Edilen</div><div style="font-weight:600;color:var(--c-primary);font-size:.9rem;">{{ exchange.offered_book.title }}</div></div>
+      <div style="font-size:1.5rem;color:var(--c-accent);">⇄</div>
+      <div style="text-align:center;"><div style="font-size:.78rem;color:var(--c-text-muted);font-family:sans-serif;margin-bottom:3px;">İstenen</div><div style="font-weight:600;color:var(--c-primary);font-size:.9rem;">{{ exchange.requested_book.title }}</div></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;padding:1rem;background:var(--c-surface);border-radius:var(--radius);">
+    {% if receiver.profile_photo %}<img src="{{ receiver.profile_photo.url }}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;">
+    {% else %}<div style="width:52px;height:52px;border-radius:50%;background:var(--c-surface-2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">👤</div>{% endif %}
+    <div><div style="font-weight:700;color:var(--c-primary);">{{ receiver.get_full_name }}</div><div class="text-muted" style="font-size:.82rem;">@{{ receiver.username }}{% if receiver.city %} &bull; {{ receiver.city }}{% endif %}</div></div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Puan *</label>
+      <div class="star-radio-group" style="margin-top:8px;">
+        {% for val, label in form.score.field.choices %}
+        <input type="radio" id="star{{ val }}" name="score" value="{{ val }}" {% if form.score.value == val|stringformat:"s" %}checked{% endif %} required>
+        <label for="star{{ val }}" title="{{ val }} yıldız">★</label>
+        {% endfor %}
+      </div>
+      {% for e in form.score.errors %}<div class="form-error" style="margin-top:6px;">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label class="form-label">Yorum (opsiyonel)</label>
+      <textarea name="comment" class="form-control" rows="3" placeholder="Takas deneyiminizi paylaşın…">{{ form.comment.value|default:'' }}</textarea>
+    </div>
+    <div style="display:flex;gap:.75rem;margin-top:.5rem;">
+      <button type="submit" class="btn btn-primary">Değerlendirmeyi Gönder</button>
+      <a href="{% url 'exchange:history' %}" class="btn btn-secondary">Vazgeç</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

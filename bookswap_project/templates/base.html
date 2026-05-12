@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}BookSwap{% endblock %} — Kitap Takas Platformu</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<nav class="navbar">
+  <a href="{% url 'books:home' %}" class="navbar-brand">📚 BookSwap</a>
+  <div class="navbar-links">
+    {% if user.is_authenticated %}
+      <a href="{% url 'books:my_library' %}" {% if request.resolver_match.url_name == 'my_library' %}class="active"{% endif %}>Kütüphanem</a>
+      <a href="{% url 'books:discover' %}" {% if request.resolver_match.url_name == 'discover' %}class="active"{% endif %}>Keşfet</a>
+      <div class="nav-divider"></div>
+      <a href="{% url 'exchange:incoming' %}" {% if request.resolver_match.url_name == 'incoming' %}class="active"{% endif %}>📬 Gelen</a>
+      <a href="{% url 'exchange:outgoing' %}" {% if request.resolver_match.url_name == 'outgoing' %}class="active"{% endif %}>📤 Gönderilen</a>
+      <a href="{% url 'exchange:history' %}" {% if request.resolver_match.url_name == 'history' %}class="active"{% endif %}>Geçmiş</a>
+      <div class="nav-divider"></div>
+      <a href="{% url 'accounts:profile' %}" {% if request.resolver_match.url_name == 'profile' %}class="active"{% endif %}>{{ user.get_full_name|default:user.username }}</a>
+      <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="nav-btn">Çıkış</button>
+      </form>
+    {% else %}
+      <a href="{% url 'books:discover' %}">Keşfet</a>
+      <div class="nav-divider"></div>
+      <a href="{% url 'accounts:login' %}">Giriş Yap</a>
+      <a href="{% url 'accounts:register' %}">Kayıt Ol</a>
+    {% endif %}
+  </div>
+</nav>
+
+<main class="main-content">
+  <div class="container">
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer>
+  <p>📚 BookSwap — Kitaplarını paylaş, yeni dünyalar keşfet &copy; 2025</p>
+</footer>
+</body>
+</html>

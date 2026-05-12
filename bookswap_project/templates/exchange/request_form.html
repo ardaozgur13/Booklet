@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Takas Teklif Et{% endblock %}
+{% block content %}
+<div class="form-box form-box-wide" style="margin-top:1rem;">
+  <div class="form-title"><h2>🔄 Takas Teklif Et</h2></div>
+  <div class="card" style="background:var(--c-surface);margin-bottom:1.75rem;">
+    <p class="text-muted" style="font-size:.82rem;margin-bottom:.5rem;font-family:sans-serif;">İstediğiniz Kitap</p>
+    <div style="display:flex;gap:1rem;align-items:flex-start;">
+      <div class="book-spine"></div>
+      <div>
+        <div style="font-weight:700;color:var(--c-primary);font-size:1.05rem;">{{ requested_book.title }}</div>
+        <div style="color:var(--c-text-muted);font-size:.88rem;font-family:sans-serif;">{{ requested_book.author }}</div>
+        <div style="color:var(--c-text-muted);font-size:.82rem;font-family:sans-serif;margin-top:4px;">{{ requested_book.publisher }} &bull; {{ requested_book.edition }}. Baskı</div>
+        <div style="margin-top:.5rem;font-size:.85rem;font-family:sans-serif;">
+          Sahibi: <a href="{% url 'accounts:user_profile' requested_book.owner.pk %}" style="color:var(--c-secondary);">{{ requested_book.owner.get_full_name }}</a>
+          {% if requested_book.owner.city %}&bull; {{ requested_book.owner.city }}{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Teklif Etmek İstediğiniz Kitap *</label>
+      <select name="offered_book" class="form-control" required>
+        <option value="">— Bir kitap seçin —</option>
+        {% for book in form.offered_book.field.queryset %}
+        <option value="{{ book.pk }}" {% if form.offered_book.value == book.pk|stringformat:"s" %}selected{% endif %}>
+          {{ book.title }} — {{ book.author }} ({{ book.edition }}. Baskı)
+        </option>
+        {% endfor %}
+      </select>
+      {% for e in form.offered_book.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+      <div class="form-text">Karşı tarafa teklif edeceğiniz kitabı seçin.</div>
+    </div>
+    <div style="display:flex;gap:.75rem;margin-top:.5rem;">
+      <button type="submit" class="btn btn-accent">Teklif Gönder</button>
+      <a href="{% url 'books:discover' %}" class="btn btn-secondary">İptal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

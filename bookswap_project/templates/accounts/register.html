@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Kayıt Ol{% endblock %}
+{% block content %}
+<div class="form-box form-box-wide" style="margin-top:1rem;">
+  <div class="form-title"><h2>📚 Hesap Oluştur</h2><p class="text-muted">BookSwap topluluğuna katıl</p></div>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ad *</label>
+        <input type="text" name="first_name" class="form-control" value="{{ form.first_name.value|default:'' }}" required>
+        {% for e in form.first_name.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Soyad *</label>
+        <input type="text" name="last_name" class="form-control" value="{{ form.last_name.value|default:'' }}" required>
+        {% for e in form.last_name.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kullanıcı Adı *</label>
+      <input type="text" name="username" class="form-control" value="{{ form.username.value|default:'' }}" required>
+      {% for e in form.username.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      <label class="form-label">E-posta *</label>
+      <input type="email" name="email" class="form-control" value="{{ form.email.value|default:'' }}" required>
+      {% for e in form.email.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Şehir</label>
+        <input type="text" name="city" class="form-control" value="{{ form.city.value|default:'' }}" placeholder="İstanbul">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefon (opsiyonel)</label>
+        <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default:'' }}" placeholder="05xx xxx xx xx">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cinsiyet</label>
+      <select name="gender" class="form-control">
+        <option value="">Seçiniz</option>
+        <option value="E" {% if form.gender.value == 'E' %}selected{% endif %}>Erkek</option>
+        <option value="K" {% if form.gender.value == 'K' %}selected{% endif %}>Kadın</option>
+        <option value="B" {% if form.gender.value == 'B' %}selected{% endif %}>Belirtmek istemiyorum</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Profil Fotoğrafı (opsiyonel)</label>
+      <input type="file" name="profile_photo" class="form-control" accept="image/*">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Şifre *</label>
+        <input type="password" name="password1" class="form-control" required>
+        {% for e in form.password1.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Şifre Tekrar *</label>
+        <input type="password" name="password2" class="form-control" required>
+        {% for e in form.password2.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+    {% if form.non_field_errors %}{% for e in form.non_field_errors %}<div class="form-error" style="margin-bottom:1rem;">{{ e }}</div>{% endfor %}{% endif %}
+    <button type="submit" class="btn btn-primary btn-full" style="margin-top:.5rem;">Hesap Oluştur</button>
+  </form>
+  <p class="text-muted" style="text-align:center;margin-top:1.25rem;">Zaten hesabın var mı? <a href="{% url 'accounts:login' %}">Giriş Yap</a></p>
+</div>
+{% endblock %}
