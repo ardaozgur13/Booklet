@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}BookSwap{% endblock %} — Kitap Takas Platformu</title>
+  <title>{% block title %}Booklet{% endblock %} — Kitap Takas Platformu</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
 <nav class="navbar">
-  <a href="{% url 'books:home' %}" class="navbar-brand">📚 BookSwap</a>
+  <a href="{% url 'books:home' %}" class="navbar-brand">📚 Booklet</a>
   <div class="navbar-links">
     {% if user.is_authenticated %}
       <a href="{% url 'books:my_library' %}" {% if request.resolver_match.url_name == 'my_library' %}class="active"{% endif %}>Kütüphanem</a>
@@ -48,7 +48,7 @@
 </main>
 
 <footer>
-  <p>📚 BookSwap — Kitaplarını paylaş, yeni dünyalar keşfet &copy; 2025</p>
+  <p>📚 Booklet — Kitaplarını paylaş, yeni dünyalar keşfet &copy; 2025</p>
 </footer>
 </body>
 </html>
