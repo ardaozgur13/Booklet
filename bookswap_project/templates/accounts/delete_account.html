@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Hesabı Sil{% endblock %}
+{% block content %}
+
+<div class="form-box" style="margin-top:2rem;text-align:center;">
+  <div style="font-size:3rem;margin-bottom:1rem;">⚠️</div>
+  <h2 style="margin-bottom:.5rem;">Hesabı Sil</h2>
+  <p class="text-muted" style="margin-bottom:.5rem;">
+    <strong>{{ request.user.get_full_name }}</strong>, hesabınızı silmek istediğinizden emin misiniz?
+  </p>
+  <p class="text-muted" style="margin-bottom:1.5rem;font-size:.88rem;">
+    Tüm kitaplarınız, takas geçmişiniz ve mesajlarınız kalıcı olarak silinecek. Bu işlem geri alınamaz.
+  </p>
+  <form method="post" style="display:flex;gap:.75rem;justify-content:center;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Evet, Hesabımı Sil</button>
+    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Vazgeç</a>
+  </form>
+</div>
+
+{% endblock %}

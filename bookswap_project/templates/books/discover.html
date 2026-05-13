@@ -8,13 +8,7 @@
       <label class="form-label">Ara</label>
       <input type="text" name="q" class="form-control" placeholder="Kitap adı veya yazar…" value="{{ q }}">
     </div>
-    <div class="form-group" style="min-width:160px;">
-      <label class="form-label">Şehir</label>
-      <select name="city" class="form-control">
-        <option value="">Tüm Şehirler</option>
-        {% for c in cities %}<option value="{{ c }}" {% if c == city %}selected{% endif %}>{{ c }}</option>{% endfor %}
-      </select>
-    </div>
+    
     <div class="form-group" style="min-width:160px;">
       <label class="form-label">Tür</label>
       <select name="genre" class="form-control">

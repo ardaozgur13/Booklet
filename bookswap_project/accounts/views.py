@@ -61,3 +61,13 @@ def profile_edit_view(request):
 def user_profile_view(request, pk):
     profile_user = get_object_or_404(CustomUser, pk=pk)
     return render(request, 'accounts/profile.html', {'profile_user': profile_user})
+
+@login_required
+def delete_account_view(request):
+    if request.method == 'POST':
+        user = request.user
+        logout(request)
+        user.delete()
+        messages.success(request, 'Hesabınız silindi.')
+        return redirect('books:home')
+    return render(request, 'accounts/delete_account.html')
