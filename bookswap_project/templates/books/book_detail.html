@@ -4,8 +4,16 @@
 <div style="max-width:700px;margin:0 auto;">
   <div class="card">
     <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
-      <div style="width:72px;height:96px;background:var(--c-surface-2);border-radius:4px 10px 10px 4px;border-left:8px solid var(--c-accent);flex-shrink:0;"></div>
+      {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}"
+             style="width:110px;height:155px;object-fit:cover;border-radius:4px 12px 12px 4px;flex-shrink:0;box-shadow:3px 3px 12px rgba(92,61,30,0.22);border-left:5px solid var(--c-accent);">
+      {% else %}
+        <div style="width:110px;height:155px;background:var(--c-surface-2);border-radius:4px 12px 12px 4px;border-left:5px solid var(--c-accent);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--c-border);">📖</div>
+      {% endif %}
       <div style="flex:1;">
+        <div style="margin-bottom:.5rem;">
+          <span class="badge" style="background:var(--c-surface-2);color:var(--c-secondary);font-size:.75rem;">{{ book.get_genre_display }}</span>
+        </div>
         <h1 style="font-size:1.5rem;margin-bottom:.3rem;">{{ book.title }}</h1>
         <p style="color:var(--c-text-muted);font-size:1rem;font-family:sans-serif;">{{ book.author }}</p>
         <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-family:sans-serif;font-size:.9rem;">
@@ -17,7 +25,16 @@
         {% if book.is_public %}<div style="margin-top:1rem;"><span class="badge badge-public">✓ Takas Listesinde</span></div>{% endif %}
       </div>
     </div>
+
+    {% if book.summary %}
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--c-surface);border-radius:var(--radius);">
+      <div style="font-size:.8rem;font-weight:700;color:var(--c-primary);margin-bottom:.4rem;font-family:'Georgia',serif;">Özet</div>
+      <p style="font-size:.9rem;line-height:1.65;margin:0;font-family:sans-serif;">{{ book.summary }}</p>
+    </div>
+    {% endif %}
+
     <hr style="border:none;border-top:1px solid var(--c-border);margin:1.5rem 0;">
+
     <div style="display:flex;align-items:center;gap:.75rem;">
       {% if book.owner.profile_photo %}
         <img src="{{ book.owner.profile_photo.url }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
@@ -29,6 +46,7 @@
         {% if book.owner.city %}<div class="text-muted" style="font-size:.82rem;">{{ book.owner.city }}</div>{% endif %}
       </div>
     </div>
+
     <div style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;">
       {% if user.is_authenticated and book.owner != user and book.is_public %}
         <a href="{% url 'exchange:request' book.pk %}" class="btn btn-accent">Takas Teklif Et</a>

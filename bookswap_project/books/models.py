@@ -26,7 +26,7 @@ class Book(models.Model):
     page_count = models.PositiveIntegerField(verbose_name='Sayfa Sayısı')
     genre = models.CharField(max_length=20, choices=GENRE_CHOICES, default='diger', verbose_name='Tür')
     summary = models.TextField(blank=True, verbose_name='Özet')
-    
+    cover_image = models.ImageField(upload_to='book_covers/', blank=True, null=True, verbose_name='Kitap Kapağı')
     is_public = models.BooleanField(default=False, verbose_name='Takas Listesinde')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Eklenme Tarihi')
 
